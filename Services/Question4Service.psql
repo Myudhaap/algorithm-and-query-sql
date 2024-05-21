@@ -1,0 +1,89 @@
+-- CREATE DATABASE
+CREATE DATABASE IF NOT EXISTS db_algorithm; 
+
+-- CREATE TABLE
+CREATE TABLE IF NOT EXISTS pelanggan(
+	KODE VARCHAR(11) PRIMARY KEY,
+	NAMA VARCHAR(255),
+	ALAMAT VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS barang(
+	KODE VARCHAR(255) PRIMARY KEY,
+	NAMA VARCHAR(255),
+	HARGA DECIMAL(255,0)
+);
+
+CREATE TABLE IF NOT EXISTS transaksi(
+	KODE VARCHAR(255) PRIMARY KEY,
+	TANGGAL DATE,
+	KODE_PELANGGAN VARCHAR(255),
+	KODE_BARANG VARCHAR(255),
+	JUMLAH_BARANG DECIMAL(255,0),
+	FOREIGN KEY (KODE_PELANGGAN) REFERENCES pelanggan(KODE),
+	FOREIGN KEY (KODE_BARANG) REFERENCES barang(KODE)
+);
+
+-- INSERT DATA
+INSERT INTO pelanggan (KODE, NAMA, ALAMAT)
+VALUES('P1', 'Yogi', 'JAKARTA'),
+('P2', 'Anggi', 'BANDUNG'),
+('P3', 'Rahma', 'BANDUNG');
+
+INSERT INTO barang (KODE, NAMA, HARGA)
+VALUES
+('B1', 'Baju', 12000),
+('B2', 'Celana', 10000),
+('B3', 'Sepatu', 30000);
+
+INSERT INTO transaksi (KODE, TANGGAL, KODE_PELANGGAN, KODE_BARANG, JUMLAH_BARANG)
+VALUES
+('TRX001', '2019-10-01', 'P1', 'B1', 3),
+('TRX002', '2019-10-02', 'P2', 'B2', 2),
+('TRX003', '2019-10-08', 'P2', 'B1', 5),
+('TRX004', '2019-10-10', 'P1', 'B1', 1),
+('TRX005', '2019-10-17', 'P3', 'B2', 2),
+('TRX006', '2019-10-17', 'P2', 'B3', 1),
+('TRX007', '2019-10-18', 'P3', 'B1', 4),
+('TRX008', '2019-10-18', 'P2', 'B2', 2);
+
+-- QUESTION
+-- SOAL A. Data barang dengan harga lebih besar dari 10,000 diurut berdasarkan harga satuan (ASCENDING). 
+SELECT * FROM barang
+WHERE HARGA > 10000
+ORDER BY HARGA;
+
+-- SOAL B. Data pelanggan yang namanya mengandung huruf "g" dengan alamaat "BANDUNG".
+SELECT * FROM pelanggan
+WHERE LOWER(NAMA) LIKE '%g%' AND ALAMAT = 'BANDUNG';
+
+-- SOAL C. Data seluruh transaksi sesuai dengan tampilan yang ditentukan.
+SELECT 
+t.KODE AS KODE, t.TANGGAL AS TANGGAL, p.NAMA AS "NAMA PELANGGAN", 
+b.NAMA AS "NAMA BARANG", t.JUMLAH_BARANG AS "JUMLAH",
+b.HARGA AS "HARGA SATUAN", (t.JUMLAH_BARANG * b.HARGA) AS TOTAL
+FROM pelanggan p
+JOIN transaksi t ON p.KODE = t.KODE_PELANGGAN
+JOIN barang b ON t.KODE_BARANG = b.KODE
+ORDER BY p.NAMA, t.TANGGAL;
+
+-- SOAL D. Data rekap nama, jumlah, dan total harga pembelian sesuai dengan tampilan yang ditentukan.
+SELECT 
+p.NAMA AS "NAMA PELANGGAN",
+SUM(t.JUMLAH_BARANG) AS "JUMLAH",
+SUM(t.JUMLAH_BARANG * b.HARGA) AS "TOTAL HARGA"
+FROM pelanggan p
+JOIN transaksi t ON p.KODE = t.KODE_PELANGGAN
+JOIN barang b ON t.KODE_BARANG = b.KODE
+GROUP BY p.NAMA
+ORDER BY "TOTAL HARGA" DESC;
+
+
+
+
+
+
+
+
+
+
